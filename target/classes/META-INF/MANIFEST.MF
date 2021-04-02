@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Built-By: hvlnc
+Build-Jdk: 15
+Implementation-Title: RulesEngine-App
+Implementation-Version: 1.0-SNAPSHOT
+Implementation-Vendor-Id: com.visio.rules.engine
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-boot
+ -starter-parent/RulesEngine-App
+Created-By: Maven Integration for Eclipse
+
