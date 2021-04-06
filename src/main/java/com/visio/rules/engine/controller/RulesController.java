@@ -154,7 +154,7 @@ public class RulesController {
 		return ruleCond; 
 	}
 	
-	private RuleAction buildActionFromMap(HashMap<String,String> actionMap) { 
+	public RuleAction buildActionFromMap(HashMap<String,String> actionMap) { 
 		RuleAction ruleAction = new RuleAction(); 
 		
 		if("Person".equals(actionMap.get("type"))) {
