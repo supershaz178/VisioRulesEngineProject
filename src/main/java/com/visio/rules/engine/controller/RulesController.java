@@ -22,7 +22,11 @@ import com.visio.rules.engine.persistance.ProductCondition;
 import com.visio.rules.engine.persistance.RuleAction;
 import com.visio.rules.engine.persistance.RuleCondition;
 import com.visio.rules.engine.persistance.Rules;
+import com.visio.rules.engine.repository.PersonActionRepository;
+import com.visio.rules.engine.repository.PersonConditionRepository;
 import com.visio.rules.engine.repository.PersonRepository;
+import com.visio.rules.engine.repository.ProductActionRepository;
+import com.visio.rules.engine.repository.ProductConditionRepository;
 import com.visio.rules.engine.repository.ProductRepository;
 import com.visio.rules.engine.repository.RulesRepository;
 import com.visio.rules.engine.service.RulesService;
@@ -35,7 +39,20 @@ public class RulesController {
 	private RulesService service; 
 	
 	@Autowired
-	private RulesRepository repo; 
+	private RulesRepository repo;
+	
+	@Autowired
+	private PersonConditionRepository personCondRepo; 
+
+	@Autowired
+	private ProductConditionRepository prodCondRepo; 
+
+	@Autowired
+	private PersonActionRepository personActionRepo; 
+
+	@Autowired
+	private ProductActionRepository prodActionRepo; 
+
 	
 	@Autowired
 	private PersonRepository persRepo; 
@@ -90,6 +107,7 @@ public class RulesController {
 		newRule.setCondition(buildConditionFromMap(ruleJson.get("condition")));
 		newRule.setAction(buildActionFromMap(ruleJson.get("action")));
 		
+		
 		newRule.setDateCreated(new Date(System.currentTimeMillis()));
 		newRule.setDateUpdated(new Date(System.currentTimeMillis()));
 		repo.save(newRule); 
@@ -98,7 +116,7 @@ public class RulesController {
 		
 	}
 	
-	private RuleCondition buildConditionFromMap(HashMap<String,String> conditionMap) { 
+	public RuleCondition buildConditionFromMap(HashMap<String,String> conditionMap) { 
 		RuleCondition ruleCond = new RuleCondition(); 
 		
 		if("Person".equals(conditionMap.get("type"))) {
@@ -107,7 +125,7 @@ public class RulesController {
 			cond.setCreditScore(Integer.valueOf(conditionMap.get("creditScore")));
 			cond.setCreditScoreOperation(conditionMap.get("creditScoreOperation"));
 			cond.setIsStateRule(Boolean.valueOf(conditionMap.get("stateRule")));
-			
+			cond.setDescription(conditionMap.get("condDescription"));
 			String stateString = conditionMap.get("stateCheck"); 
 			if((State.valueOfAbbreviation(stateString) != State.UNKNOWN) || 
 					(State.valueOfName(stateString)!= State.UNKNOWN)) {
@@ -119,8 +137,7 @@ public class RulesController {
 					cond.setStateCheck(State.UNKNOWN); 
 				}
 			}
-			
-			ruleCond = cond; 
+			ruleCond = personCondRepo.save(cond); 
 		}else {
 			ProductCondition cond = new ProductCondition(); 
 			cond.setIsNameRule(Boolean.valueOf(conditionMap.get("nameRule")));
@@ -131,8 +148,8 @@ public class RulesController {
 			cond.setInterestRateOperation(conditionMap.get("interestRateOperation"));
 			cond.setIsDisqualifingRule(Boolean.valueOf(conditionMap.get("disqualifyingRule")));
 			cond.setDisqualifyingCheck(Boolean.valueOf(conditionMap.get("disqualifying")));
-			
-			ruleCond = cond; 
+			cond.setDescription(conditionMap.get("condDescription"));
+			ruleCond = prodCondRepo.save(cond);
 		}
 		return ruleCond; 
 	}
@@ -145,8 +162,8 @@ public class RulesController {
 			action.setIsCreditScoreAction(Boolean.valueOf(actionMap.get("creditScoreRule"))); 
 			action.setCreditScore(Integer.valueOf(actionMap.get("creditScore")));
 			action.setCreditScoreOperation(actionMap.get("creditScoreOperation"));
-			
-			ruleAction = action; 
+			action.setDescription(actionMap.get("actionDescription"));
+			ruleAction = personActionRepo.save(action); 
 		}else {
 			ProductAction action = new ProductAction();
 			action.setIsInterestRateAction(Boolean.valueOf(actionMap.get("interestRateRule")));
@@ -154,8 +171,8 @@ public class RulesController {
 			action.setInterestRateOperation(actionMap.get("interestRateOperation"));
 			action.setIsDisqualifingAction(Boolean.valueOf(actionMap.get("disqualifyingRule")));
 			action.setDisqualifyChangeTo(Boolean.valueOf(actionMap.get("disqualifying")));
-			
-			ruleAction = action; 
+			action.setDescription(actionMap.get("actionDescription"));
+			ruleAction = prodActionRepo.save(action); 
 		}
 		return ruleAction; 
 	}
